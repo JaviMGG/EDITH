@@ -5,7 +5,7 @@
 # Uso:
 #   ./install.sh                  instala lo básico (venv + voz Piper)
 #   ./install.sh --full           además descarga los modelos de Kokoro (motor TTS alternativo, ~380 MB)
-#   ./install.sh --with-ollama    además comprueba el modelo LLM local 'edith' (requiere Ollama instalado y en marcha)
+#   ./install.sh --with-ollama    además comprueba el modelo LLM 'JaviMGG/edith_1.0' (requiere Ollama instalado y en marcha)
 set -euo pipefail
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -77,13 +77,13 @@ fi
 # 6) Modelo LLM en Ollama (opcional)
 if [ "$OLLAMA" = 1 ]; then
   if ! command -v ollama >/dev/null 2>&1; then
-    echo "AVISO: Ollama no está instalado. Descárgalo de https://ollama.com, arráncalo y crea el modelo 'edith'." >&2
+    echo "AVISO: Ollama no está instalado. Descárgalo de https://ollama.com, arráncalo y descarga el modelo 'JaviMGG/edith_1.0'." >&2
   else
-    echo "==> Comprobando el modelo LLM local 'edith' en Ollama..."
-    if ! ollama list | grep -q '^edith[[:space:]]'; then
-      echo "AVISO: no encuentro el modelo 'edith'. Créalo con 'ollama create edith -f Modelfile'." >&2
+    echo "==> Comprobando el modelo LLM 'JaviMGG/edith_1.0' en Ollama..."
+    if ! ollama list | grep -q 'JaviMGG/edith_1.0'; then
+      echo "AVISO: no encuentro el modelo 'JaviMGG/edith_1.0'. Descárgalo con 'ollama pull JaviMGG/edith_1.0'." >&2
     else
-      echo "    Modelo 'edith' encontrado."
+      echo "    Modelo 'JaviMGG/edith_1.0' encontrado."
     fi
   fi
 fi

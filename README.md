@@ -11,7 +11,7 @@ git clone <URL_de_este_repositorio> edith
 cd edith
 ./install.sh                 # venv + dependencias + voz Piper
 # opcional:
-./install.sh --with-ollama   # además comprueba el modelo LLM local 'edith'
+./install.sh --with-ollama   # además comprueba el modelo LLM 'JaviMGG/edith_1.0'
 ./install.sh --full          # además descarga el motor TTS alternativo (Kokoro, ~380 MB)
 ```
 
@@ -204,10 +204,10 @@ curl -L -o kokoro-tokens.txt \
 
 ### 4. Modelo LLM en Ollama
 
-Crea el modelo local `edith` a partir de su `Modelfile` (base `qwen2.5:3b`):
+El LLM `edith` está publicado en el registry de Ollama (base `qwen2.5:3b`, con la personalidad ya embebida). No necesitas el `Modelfile`: descárgalo directamente:
 
 ```bash
-ollama create edith -f Modelfile
+ollama pull JaviMGG/edith_1.0
 ```
 
 Verifica que el servidor responde y que el modelo está cargado:
@@ -234,7 +234,7 @@ Todo está centralizado en `config.py`:
 | `TTS_SID` | `1` | Voz de Kokoro (solo si usas `--engine kokoro`) |
 | `TTS_SPEED` | `1.0` | Velocidad de habla de Kokoro |
 | `OLLAMA_URL` | `http://localhost:11434/api/chat` | API local de Ollama |
-| `OLLAMA_MODEL` | `"edith"` | Modelo LLM local (creado con `ollama create`) |
+| `OLLAMA_MODEL` | `"JaviMGG/edith_1.0"` | Modelo LLM en Ollama (descargado con `ollama pull`) |
 | `SYSTEM_PROMPT` | `""` | Sistema extra opcional (vacío = se usa la personalidad embebida del modelo `edith`) |
 | `SAMPLE_RATE` | `16000` | Tasa del micrófono (Whisper) |
 | `VAD_AGGRESSIVENESS` | `1` | Sensibilidad del VAD para detectar el inicio del habla (0 = menos sensible, 3 = más; más alto corta arranques suaves) |
@@ -323,7 +323,7 @@ Admite wav, mp3, ogg, etc. Opción `-m tiny|base|small|medium` para elegir el mo
   ```bash
   curl http://localhost:11434/api/tags
   ```
-  Si no responde, arranca Ollama (`systemctl --user start ollama` o el servicio de tu distro) y comprueba que el modelo `edith` existe (`ollama list`).
+  Si no responde, arranca Ollama (`systemctl --user start ollama` o el servicio de tu distro) y comprueba que el modelo `JaviMGG/edith_1.0` existe (`ollama list`); si no, descárgalo con `ollama pull JaviMGG/edith_1.0`.
 
 ---
 

@@ -25,7 +25,7 @@ PIPER_CONFIG = BASE / "models" / "piper" / "es_ES-sharvard-medium.onnx.json"
 PIPER_SPEAKER_ID = 1
 
 OLLAMA_URL = "http://localhost:11434/api/chat"
-OLLAMA_MODEL = "edith"
+OLLAMA_MODEL = "JaviMGG/edith_1.0"
 SYSTEM_PROMPT = ""
 
 SAMPLE_RATE = 16000
