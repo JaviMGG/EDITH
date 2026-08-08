@@ -1,0 +1,10 @@
+faster-whisper==1.2.1
+sounddevice==0.5.5
+soundfile==0.14.0
+webrtcvad==2.0.10
+piper-tts==1.6.0
+sherpa-onnx==1.13.4
+kokoro-onnx==0.4.7
+espeakng-loader==0.2.4
+httpx==0.28.1
+setuptools<81
