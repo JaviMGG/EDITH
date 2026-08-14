@@ -18,8 +18,10 @@ cd edith
 Y a usarlo:
 
 ```bash
-./.venv/bin/python assistant.py
+./.venv/bin/python main.py
 ```
+
+`main.py` es la interfaz con la que se usa normalmente: una TUI con un "cerebro" animado que escucha, piensa y responde. `assistant.py` es la versión de solo terminal (sin interfaz).
 
 El instalador lo deja todo listo: entorno aislado, dependencias y modelos. El modelo de transcripción (Whisper) se descarga solo la primera vez que ejecutas algo.
 
@@ -65,13 +67,14 @@ micrófono → VAD → STT → Ollama → TTS → altavoz
 
 ```
 ~/Documentos/EDITH/
-├── assistant.py        # Loop completo: mic → STT → Ollama → TTS → altavoz
-├── transcribe.py       # Transcribe archivos de audio a texto (por lotes)
-├── tts.py              # Texto → voz (con 2 motores: piper y kokoro)
-├── config.py           # Toda la configuración centralizada
-├── requirements.txt    # Dependencias Python
-├── README.md           # Este documento
-├── .venv/              # Entorno Python aislado (no se toca a mano)
+├── main.py            # Interfaz TUI (recomendada): cerebro animado + chat
+├── assistant.py       # Loop de consola: mic → STT → Ollama → TTS → altavoz
+├── transcribe.py      # Transcribe archivos de audio a texto (por lotes)
+├── tts.py             # Texto → voz (con 2 motores: piper y kokoro)
+├── config.py          # Toda la configuración centralizada
+├── requirements.txt   # Dependencias Python
+├── README.md          # Este documento
+├── .venv/             # Entorno Python aislado (no se toca a mano)
 └── models/
     ├── kokoro-multilang.onnx      # Modelo TTS Kokoro (multilingüe, 311 MB)
     ├── kokoro-voices.bin          # Voces de Kokoro (52 MB)
@@ -99,6 +102,7 @@ micrófono → VAD → STT → Ollama → TTS → altavoz
 | `sounddevice` | 0.5.5 | Entrada/salida de audio (micrófono y altavoz) vía PortAudio |
 | `soundfile` | 0.14.0 | Leer/escribir archivos de audio (wav, etc.) |
 | `httpx` | 0.28.1 | Llamadas HTTP a la API local de Ollama |
+| `textual` | 8.x | TUI (interfaz de terminal) de `main.py` |
 | `onnxruntime` | 1.28.0 | Motor de inferencia ONNX (piper y kokoro) |
 | `numpy` | 2.5.1 | Procesado de las muestras de audio |
 
@@ -246,16 +250,27 @@ Todo está centralizado en `config.py`:
 
 Todos los comandos se ejecutan desde cualquier carpeta usando la ruta absoluta del intérprete del venv.
 
-### Asistente de voz
+### Asistente de voz (interfaz TUI)
+
+```bash
+~/Documentos/EDITH/.venv/bin/python ~/Documentos/EDITH/main.py
+```
+
+`main.py` arranca una interfaz de terminal (TUI) con un cerebro animado en el centro que reacciona al estado (escuchando, pensando, hablando…). Al cargar los modelos muestra `Escuchando…`.
+
+- Habla y **pulsa Enter** (o el botón 🎤 / `Ctrl+G`) cuando termines la frase: se envía al instante (no espera silencio).
+- También puedes escribir un mensaje en el campo de entrada y pulsar `Enviar`.
+- EDITH responde con voz (femenina) y sigue escuchando.
+- Escribe `salir` + Enter (o `Ctrl+C` / `q`) para salir.
+- Requiere Ollama corriendo.
+
+### Asistente de voz (solo consola)
 
 ```bash
 ~/Documentos/EDITH/.venv/bin/python ~/Documentos/EDITH/assistant.py
 ```
 
-- Habla y **pulsa Enter** cuando termines la frase: se envía al instante (no espera silencio).
-- EDITH responde con voz (femenina) y sigue escuchando.
-- Escribe `salir` + Enter (o `Ctrl+C`) para salir.
-- Requiere Ollama corriendo.
+La versión clásica sin interfaz: habla y **pulsa Enter** cuando termines la frase, EDITH responde con voz y sigue escuchando. Escribe `salir` + Enter (o `Ctrl+C`) para salir. Requiere Ollama corriendo.
 
 ### Texto a voz
 
@@ -311,6 +326,9 @@ Admite wav, mp3, ogg, etc. Opción `-m tiny|base|small|medium` para elegir el mo
 
 - **`espeak-ng` no se encuentra**
   No lo instales con pacman: el venv ya lo trae. Los scripts llaman a `espeakng_loader.load_library()` antes de importar `sherpa_onnx`, que carga `libespeak-ng.so` en el proceso.
+
+- **`Error cargando modelos: bad val` al abrir `main.py` la primera vez**
+  Sucede al descargar Whisper por primera vez dentro del hilo de carga de la TUI: `tqdm` intenta crear un lock de multiprocesamiento desde un hilo y el `fork` falla con `bad value(s) in fds_to_keep`. `main.py` lo evita inicializando `TqdmDefaultWriteLock()` en el hilo principal antes de arrancar la app. Si aparece de nuevo (o descargaste el modelo a mano), basta con volver a ejecutar `main.py` o borrar la caché parcial de HuggingFace en `~/.cache/huggingface`.
 
 - **El asistente no te oye**
   Comprueba que `sounddevice` ve tu micrófono:
